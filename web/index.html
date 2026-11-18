@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fitness Center Manager</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#dashboard">
+      <span class="brand-mark" aria-hidden="true">FC</span>
+      <span>Fitness Center<small>Staff console</small></span>
+    </a>
+    <nav id="menu" aria-label="Main menu"></nav>
+  </aside>
+
+  <main>
+    <header class="page-head">
+      <div>
+        <h1 id="page-title"></h1>
+        <p id="page-subtitle"></p>
+      </div>
+      <div id="page-actions" class="actions"></div>
+    </header>
+    <div id="content"></div>
+  </main>
+
+  <div id="toasts" aria-live="polite"></div>
+  <script src="/app.js"></script>
+</body>
+</html>
