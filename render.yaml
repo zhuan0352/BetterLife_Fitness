@@ -1,0 +1,13 @@
+# Render Blueprint: Dashboard > New > Blueprint, then pick this repository.
+services:
+  - type: web
+    name: betterlife-fitness
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/info
+    autoDeploy: true
+    envVars:
+      - key: DEMO_MODE
+        value: "true"
+      - key: TZ
+        value: America/Toronto

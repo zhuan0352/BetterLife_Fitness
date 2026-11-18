@@ -872,3 +872,7 @@ $('#menu').append(...MENU.map((entry) => (entry.group
 
 window.addEventListener('hashchange', route);
 route();
+
+api.get('/api/info')
+  .then((info) => { $('#demo-banner').hidden = !info.demo; })
+  .catch(() => {});

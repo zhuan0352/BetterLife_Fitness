@@ -22,6 +22,37 @@ sample data dated around today.
 
 To start over with fresh sample data, stop the app and delete `fitness_center.db`.
 
+## Deploy to Render (public demo link)
+
+The repository includes a `Dockerfile` and a `render.yaml` blueprint, so Render can build and host
+it with no extra configuration.
+
+1. Push this repository to GitHub.
+2. In the [Render dashboard](https://dashboard.render.com), choose **New > Blueprint**, connect
+   GitHub, and pick this repository. Render reads `render.yaml` and proposes one free web service.
+3. Click **Apply**. The first build takes a few minutes; the service then gets a public URL like
+   `https://betterlife-fitness.onrender.com`.
+
+After that, every push to `main` redeploys automatically.
+
+What to expect on the free plan:
+
+- **Cold starts.** The service sleeps after 15 minutes without visitors. The next visit takes
+  about a minute to wake it, then it is fast. Opening the link yourself shortly before sharing it helps.
+- **Data resets.** Free services have no persistent disk, so the database is rebuilt from the sample
+  data on every restart, redeploy and wake-up. For a public demo that is a feature: whatever visitors
+  change, the next person starts clean. A banner at the top of the page tells visitors this.
+- **Times** are shown in the `TZ` set in `render.yaml` (America/Toronto). Change it there if needed.
+
+Deployment settings (all already set by the `Dockerfile` and `render.yaml`):
+
+| Variable | Value on Render | Why |
+| --- | --- | --- |
+| `HOST` | `0.0.0.0` | Accept outside traffic. Locally it defaults to localhost only. |
+| `PORT` | set by Render | The port Render routes to. |
+| `DEMO_MODE` | `true` | Shows the "live demo" banner. |
+| `TZ` | `America/Toronto` | The gym's local time for "today" and the schedule. |
+
 ## The menu
 
 | Menu item | What staff can do |
@@ -73,7 +104,9 @@ as plain strings in SQLite.
 ## Project layout
 
 ```
-run.sh            compile and start (downloads the JDBC driver on first run if missing)
+run.sh            compile and start locally (downloads the JDBC driver if missing)
+Dockerfile        container image used by Render
+render.yaml       Render blueprint (free web service, health check, env vars)
 sql/              schema.sql, seed.sql
 src/gym/
   Main.java       entry point: opens the database, registers routes, starts the server
@@ -103,5 +136,7 @@ back as `{"error": "..."}` with a 4xx status.
 
 ## Scope
 
-This is a single-user staff tool: there is no login, and the server listens on `localhost` only.
-All SQL uses bound parameters, and the page writes database text with `textContent`, never as HTML.
+This is a staff tool with no login. Run locally, the server listens on `localhost` only; the public
+demo is open to anyone with the link, which is why it holds only sample data and resets on restart.
+All SQL uses bound parameters, the page writes database text with `textContent` (never as HTML),
+request bodies are capped at 64 KB and text fields at 500 characters.

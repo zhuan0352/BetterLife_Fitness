@@ -37,6 +37,8 @@ final class Request {
         return value == null || value.isBlank() ? null : value.trim();
     }
 
+    static final int MAX_TEXT = 500;
+
     /** A body field as trimmed text, or null when absent or blank. */
     String text(String key) {
         Object value = body.get(key);
@@ -44,6 +46,9 @@ final class Request {
             return null;
         }
         String text = value.toString().trim();
+        if (text.length() > MAX_TEXT) {
+            throw ApiException.badRequest("\"" + key.replace('_', ' ') + "\" is too long (max " + MAX_TEXT + " characters).");
+        }
         return text.isEmpty() ? null : text;
     }
 

@@ -44,10 +44,19 @@ final class WebServer {
     private final HttpServer http;
     private final Path webRoot;
 
-    WebServer(int port, Path webRoot) throws IOException {
+    /** Largest request body accepted; the public demo shouldn't be able to fill the disk. */
+    private static final int MAX_BODY_BYTES = 64 * 1024;
+
+    /**
+     * host == null listens on loopback only (the default when run locally: there is no login).
+     * A deployment passes "0.0.0.0" so the hosting platform can route traffic in.
+     */
+    WebServer(String host, int port, Path webRoot) throws IOException {
         this.webRoot = webRoot.toAbsolutePath().normalize();
-        // Loopback only: this is a staff tool with no login, so it is not exposed to the network.
-        http = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), port), 0);
+        InetSocketAddress address = host == null
+                ? new InetSocketAddress(InetAddress.getLoopbackAddress(), port)
+                : new InetSocketAddress(host, port);
+        http = HttpServer.create(address, 0);
         http.createContext("/", this::dispatch);
     }
 
@@ -148,7 +157,11 @@ final class WebServer {
 
     @SuppressWarnings("unchecked")
     private static Map<String, Object> readBody(HttpExchange exchange) throws IOException {
-        String text = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+        byte[] bytes = exchange.getRequestBody().readNBytes(MAX_BODY_BYTES + 1);
+        if (bytes.length > MAX_BODY_BYTES) {
+            throw new ApiException(413, "Request is too large.");
+        }
+        String text = new String(bytes, StandardCharsets.UTF_8);
         if (text.isBlank()) {
             return new LinkedHashMap<>();
         }

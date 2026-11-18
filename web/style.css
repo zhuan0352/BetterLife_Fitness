@@ -92,6 +92,15 @@ body {
 
 /* ---------------------------------------------------------------- page */
 
+.demo-banner {
+  margin: -6px 0 18px;
+  padding: 10px 14px;
+  border: 1px solid #b9e3d4;
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  color: #11523f;
+}
+
 main { padding: 26px 32px 48px; min-width: 0; }
 
 .page-head {
